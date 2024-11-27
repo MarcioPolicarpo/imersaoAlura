@@ -21,7 +21,7 @@ export async function savePost(req, res) {
 export async function uploadImage(req, res) {
   const newPost = {
     descricao: "",
-    imgUrl: "Alfredo", //req.file.originalname,
+    imgUrl: req.file.originalname,
     alt: "",
   };
 
@@ -39,16 +39,15 @@ export async function uploadImage(req, res) {
 export async function updateNewPost(req, res) {
   const id = req.params.id;
   const imageUrl = `http://localhost:3000/${id}.png`;
+  const post = {
+    imgUrl: imageUrl,
+    descricao: req.body.descricao,
+    alt: req.body.alt,
+  };
+
   try {
     const imgBuffer = fs.readFileSync(`uploads/${id}.png`);
-    const descricao = await generateDescription(imgBuffer);
-
-    const post = {
-      imgUrl: imageUrl,
-      descricao: descricao,
-      alt: req.body.alt,
-    };
-
+    post.descricao = await generateDescription(imgBuffer);
     const createdCriado = await updatePost(id, post);
     res.status(200).json(createdCriado);
   } catch (erro) {
